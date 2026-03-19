@@ -8,45 +8,50 @@ export default async function handler(req, res) {
   const { book, author, focus, duration } = req.body;
   const API_KEY = process.env.GEMINI_API_KEY;
 
-  const prompt = `You are a content creator for FGB Root, a YouTube and TikTok channel about wealth and money in Egyptian Arabic dialect.
+  if (!API_KEY) {
+    return res.status(500).json({ error: 'API key missing', text: '' });
+  }
 
-Book: "${book}" ${author ? 'by ' + author : ''}
-Duration: ${duration} minutes
-${focus ? 'Focus: ' + focus : ''}
+  const prompt = `أنت مساعد محتوى متخصص لقناة FGB Root على يوتيوب وتيك توك عن الثروة والمال باللهجة المصرية.
 
-IMPORTANT: Respond ONLY using these exact section headers. Each section starts with ===SECTION_NAME=== on its own line.
+الكتاب: "${book}" ${author ? 'للمؤلف ' + author : ''}
+مدة الفيديو: ${duration} دقائق
+${focus ? 'تركيز على: ' + focus : ''}
+
+اكتب المحتوى التالي بالضبط مستخدماً هذه العناوين بالترتيب:
 
 ===MAIN_TITLE===
-Write one powerful Arabic title that grabs attention (no explanation, just the title)
+اكتب عنوان عربي واحد جذاب للفيديو
 
 ===ALT_TITLES===
-Write 3 alternative Arabic titles, one per line
+اكتب 3 عناوين بديلة، كل عنوان في سطر منفصل
 
 ===HOOK===
-Write one shocking sentence in Egyptian Arabic for TikTok first 5 seconds
+اكتب جملة افتتاحية صادمة باللهجة المصرية للثواني الخمس الأولى
 
 ===SCRIPT===
-Write a complete ${duration}-minute video script in Egyptian Arabic dialect. Use short sentences. Include Egyptian examples about salary, rent, marriage. Structure: Hook 30sec, Problem 1min, Main idea 2min, Application 2min, CTA subscribe @FGBRoot
+اكتب سكريبت كامل مدة ${duration} دقائق باللهجة المصرية العامية مع أمثلة مصرية من الراتب والإيجار والجواز. 
+هيكل: هوك 30 ثانية، المشكلة دقيقة، الفكرة الأساسية دقيقتين، التطبيق دقيقتين، CTA اشتراك @FGBRoot
 
 ===DESCRIPTION===
-Write YouTube description 4-5 sentences in Arabic
+اكتب وصف يوتيوب 4-5 جمل بالعربي
 ---
-Write TikTok description 2-3 sentences in Arabic
+اكتب وصف تيك توك 2-3 جمل بالعربي
 
 ===HASHTAGS===
-Write Arabic and English hashtags on one line
+اكتب هاشتاقات عربية وإنجليزية في سطر واحد
 
 ===THUMBNAIL_1===
-Describe thumbnail design idea 1
+صف فكرة تصميم الثومبنيل الأولى
 
 ===THUMBNAIL_2===
-Describe thumbnail design idea 2
+صف فكرة تصميم الثومبنيل الثانية
 
 ===THUMBNAIL_3===
-Describe thumbnail design idea 3
+صف فكرة تصميم الثومبنيل الثالثة
 
 ===NOTEBOOKLM===
-Write a complete prompt in Arabic to paste in NotebookLM to generate an Egyptian Arabic script for this book`;
+اكتب برومبت كامل بالعربي لتحميله في NotebookLM لتوليد سكريبت بالعامية المصرية لهذا الكتاب`;
 
   try {
     const response = await fetch(
@@ -56,14 +61,37 @@ Write a complete prompt in Arabic to paste in NotebookLM to generate an Egyptian
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.8, maxOutputTokens: 8192 }
+          generationConfig: { 
+            temperature: 0.9, 
+            maxOutputTokens: 8192,
+            topP: 0.95
+          }
         })
       }
     );
+    
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    console.log('Gemini response status:', response.status);
+    console.log('Gemini data keys:', Object.keys(data));
+    
+    if (data.error) {
+      console.error('Gemini error:', JSON.stringify(data.error));
+      return res.status(200).json({ text: '', error: data.error.message });
+    }
+    
+    const candidates = data.candidates;
+    if (!candidates || candidates.length === 0) {
+      console.error('No candidates in response:', JSON.stringify(data).substring(0, 200));
+      return res.status(200).json({ text: '', debug: 'no candidates' });
+    }
+    
+    const text = candidates[0]?.content?.parts?.[0]?.text || '';
+    console.log('Text length:', text.length);
+    console.log('Text preview:', text.substring(0, 100));
+    
     res.status(200).json({ text });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch error:', err.message);
+    res.status(500).json({ error: err.message, text: '' });
   }
-          }
+}
