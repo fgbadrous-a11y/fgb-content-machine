@@ -7,7 +7,6 @@ export default async function handler(req, res) {
 
   const { book, author, focus, duration } = req.body;
   const API_KEY = process.env.GEMINI_API_KEY;
-
   if (!API_KEY) return res.status(500).json({ error: 'API key missing', text: '' });
 
   const prompt = `أنت مساعد محتوى متخصص لقناة FGB Root على يوتيوب وتيك توك عن الثروة والمال باللهجة المصرية.
@@ -16,7 +15,7 @@ export default async function handler(req, res) {
 مدة الفيديو: ${duration} دقائق
 ${focus ? 'تركيز على: ' + focus : ''}
 
-اكتب المحتوى التالي بالضبط مستخدماً هذه العناوين بالترتيب (لازم تكتب كل section):
+اكتب المحتوى التالي مستخدماً هذه العناوين بالترتيب:
 
 ===MAIN_TITLE===
 عنوان واحد عربي جذاب
@@ -48,45 +47,27 @@ ${focus ? 'تركيز على: ' + focus : ''}
 وصف فكرة الثومبنيل الثالثة
 
 ===NOTEBOOKLM===
-برومبت كامل لـ NotebookLM بالعربي لتوليد سكريبت عامية مصرية`;
+برومبت كامل لـ NotebookLM بالعربي`;
 
-  // جرب أكتر من model
-  const models = [
-    'gemini-1.5-flash',
-    'gemini-1.5-flash-8b', 
-    'gemini-1.0-pro'
-  ];
-
-  for (const model of models) {
-    try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.9, maxOutputTokens: 8192 }
-          })
-        }
-      );
-      const data = await response.json();
-      
-      if (data.error) {
-        console.log(`Model ${model} error: ${data.error.message?.substring(0, 100)}`);
-        continue; // جرب الـ model التاني
+  try {
+    const response = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.9, maxOutputTokens: 8192 }
+        })
       }
-      
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      if (text.length > 100) {
-        console.log(`Success with model: ${model}, text length: ${text.length}`);
-        return res.status(200).json({ text });
-      }
-    } catch (err) {
-      console.log(`Model ${model} fetch error: ${err.message}`);
-      continue;
+    );
+    const data = await response.json();
+    if (data.error) {
+      return res.status(200).json({ text: '', error: data.error.message });
     }
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    return res.status(200).json({ text });
+  } catch (err) {
+    return res.status(500).json({ error: err.message, text: '' });
   }
-  
-  return res.status(200).json({ text: '', error: 'All models quota exceeded. Try again tomorrow.' });
-        }
+}
