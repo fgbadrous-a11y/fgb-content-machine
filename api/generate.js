@@ -1,202 +1,22 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FGB Root Content Machine</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#0a0a0a;--s:#111;--s2:#1a1a1a;--b:#2a2a2a;--g:#c9a84c;--gl:#e8c96a;--gr:#52b788;--t:#f0ece0;--m:#888}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--t);font-family:'Cairo',sans-serif;min-height:100vh;padding:2rem 1rem}
-.wrap{max-width:860px;margin:0 auto}
-.hdr{text-align:center;margin-bottom:2.5rem;padding:2.5rem;background:var(--s);border-radius:20px;border:1px solid var(--b);position:relative;overflow:hidden}
-.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--g),var(--gr),var(--g))}
-.logo{font-size:2.2rem;font-weight:900;color:var(--g);letter-spacing:4px;margin-bottom:4px}
-.tag{font-size:.75rem;letter-spacing:3px;color:var(--m);text-transform:uppercase}
-.steps{display:flex;gap:8px;margin-bottom:2rem;padding:1rem;background:var(--s);border-radius:12px;border:1px solid var(--b)}
-.step{flex:1;text-align:center;padding:8px 4px;border-radius:8px;font-size:.75rem;color:var(--m)}
-.step.on{background:var(--g);color:#000;font-weight:700}
-.step.ok{background:#2d6a4f;color:var(--gr);font-weight:600}
-.card{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:2rem;margin-bottom:1.5rem}
-.card h2{font-size:1.1rem;color:var(--g);margin-bottom:1.5rem}
-label{font-size:.85rem;color:var(--m);margin-bottom:6px;display:block}
-input,textarea{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:12px 16px;color:var(--t);font-family:'Cairo',sans-serif;font-size:1rem;margin-bottom:1.2rem;direction:rtl}
-input:focus,textarea:focus{outline:none;border-color:var(--g)}
-textarea{resize:vertical;min-height:70px}
-.books{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:1.5rem}
-.bk{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:10px 12px;font-size:.8rem;cursor:pointer;color:var(--t);font-family:'Cairo',sans-serif;transition:all .2s}
-.bk:hover,.bk.sel{border-color:var(--g);color:var(--gl);background:rgba(201,168,76,.07)}
-.bk small{display:block;font-size:.68rem;color:var(--gr);margin-top:2px}
-.drow{display:flex;gap:8px;margin-bottom:1.2rem}
-.db{flex:1;padding:10px;background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--m);font-family:'Cairo',sans-serif;font-size:.85rem;cursor:pointer;transition:all .2s}
-.db.on{border-color:var(--g);color:var(--g);background:rgba(201,168,76,.1)}
-.btn{width:100%;padding:16px;background:var(--g);color:#000;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px}
-.btn:hover{background:var(--gl);transform:translateY(-1px)}
-.btn.out{background:transparent;border:1px solid var(--b);color:var(--m)}
-.btn.out:hover{border-color:var(--g);color:var(--g);background:transparent;transform:none}
-.outs{display:none}
-.outs.show{display:block}
-.sec{background:var(--s);border:1px solid var(--b);border-radius:16px;margin-bottom:1rem;overflow:hidden}
-.sh{display:flex;justify-content:space-between;align-items:center;padding:14px 1.5rem;background:var(--s2);border-bottom:1px solid var(--b)}
-.st{font-size:.9rem;font-weight:700;color:var(--g)}
-.bdg{font-size:.65rem;padding:2px 8px;border-radius:20px;background:rgba(82,183,136,.15);color:var(--gr);border:1px solid rgba(82,183,136,.3);margin-right:6px}
-.cp{background:transparent;border:1px solid var(--b);color:var(--m);padding:5px 14px;border-radius:6px;font-family:'Cairo',sans-serif;font-size:.75rem;cursor:pointer;transition:all .2s}
-.cp:hover{border-color:var(--g);color:var(--g)}
-.cp.ok{border-color:var(--gr);color:var(--gr)}
-.sb{padding:1.25rem 1.5rem;font-size:.9rem;line-height:1.8;white-space:pre-wrap;min-height:60px}
-.sb.tall{min-height:200px}
-.alts,.thumbs{padding:1.25rem 1.5rem;display:grid;gap:8px}
-.ai{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:10px 14px;font-size:.9rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.an{font-size:.65rem;color:var(--m);background:var(--b);padding:2px 6px;border-radius:4px;flex-shrink:0}
-.ti{background:var(--s2);border-radius:8px;padding:12px 16px;border-right:3px solid var(--g);font-size:.875rem;line-height:1.6}
-.tn{font-size:.7rem;color:var(--g);font-weight:700;margin-bottom:4px}
-.chk{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:1.5rem;margin-bottom:1rem;display:none}
-.chk.show{display:block}
-.chk h3{color:var(--g);margin-bottom:1rem}
-.pw{background:var(--s2);border-radius:4px;height:6px;margin-bottom:1.5rem;overflow:hidden}
-.pf{height:100%;background:linear-gradient(90deg,var(--g),var(--gr));border-radius:4px;transition:width .4s;width:0}
-.ci{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer}
-.ci:last-child{border:none}
-.cb{width:20px;height:20px;border:2px solid var(--b);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .2s}
-.ci.done .cb{background:#2d6a4f;border-color:var(--gr)}
-.ci.done .cb::after{content:'checkmark';color:var(--gr);font-size:11px}
-.ci.done .ct{color:var(--m);text-decoration:line-through}
-.ct{font-size:.875rem;line-height:1.6}
-.tg{font-size:.65rem;padding:1px 6px;border-radius:4px;margin-right:6px;font-weight:700}
-.tg.nb{background:rgba(201,168,76,.15);color:var(--g)}
-.tg.yt{background:rgba(255,80,80,.15);color:#ff8080}
-.tg.tt{background:rgba(80,160,255,.15);color:#80c0ff}
-.tg.cp{background:rgba(82,183,136,.15);color:var(--gr)}
-.ld{text-align:center;padding:3rem;display:none}
-.ld.show{display:block}
-.sp{width:44px;height:44px;border:3px solid var(--b);border-top-color:var(--g);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
-@keyframes spin{to{transform:rotate(360deg)}}
-.lt{color:var(--m)}
-.ntf{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:#2d6a4f;color:var(--gr);padding:10px 24px;border-radius:30px;font-size:.875rem;font-weight:600;transition:transform .3s;z-index:999;border:1px solid rgba(82,183,136,.4)}
-.ntf.show{transform:translateX(-50%) translateY(0)}
-.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
-@media(max-width:600px){.books{grid-template-columns:1fr 1fr}.logo{font-size:1.6rem}.r2{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<div class="wrap">
-<div class="hdr">
-  <div class="logo">FGB | ROOT</div>
-  <div class="tag">Where Foundation Begins — Content Machine</div>
-</div>
-<div class="steps">
-  <div class="step on" id="s1">١. الكتاب</div>
-  <div class="step" id="s2">٢. المحتوى</div>
-  <div class="step" id="s3">٣. النشر</div>
-</div>
-<div id="inp">
-<div class="card">
-  <h2>📚 اختار الكتاب</h2>
-  <label>من المقترحات:</label>
-  <div class="books">
-    <div class="bk" onclick="pick('The 4-Hour Workweek','Tim Ferriss',this)">The 4-Hour Workweek<small>🔥 أعلى توقعات</small></div>
-    <div class="bk" onclick="pick('Die With Zero','Bill Perkins',this)">Die With Zero<small>💬 جدل عالي</small></div>
-    <div class="bk" onclick="pick('Almanack of Naval Ravikant','Eric Jorgenson',this)">Almanack of Naval<small>💡 ميزة تنافسية</small></div>
-    <div class="bk" onclick="pick('Ikigai','Héctor García',this)">Ikigai<small>❤️ يلمس الشباب</small></div>
-    <div class="bk" onclick="pick('Thinking Fast and Slow','Daniel Kahneman',this)">Thinking Fast & Slow<small>🧠 عقل ومال</small></div>
-    <div class="bk" onclick="pick('Essentialism','Greg McKeown',this)">Essentialism<small>⚡ للمرهقين</small></div>
-    <div class="bk" onclick="pick('The Millionaire Next Door','Thomas Stanley',this)">Millionaire Next Door<small>💰 مال مباشر</small></div>
-    <div class="bk" onclick="pick('Your Money or Your Life','Vicki Robin',this)">Your Money or Your Life<small>⏰ وقت وفلوس</small></div>
-  </div>
-  <label>أو اكتب اسم الكتاب:</label>
-  <input id="book" type="text" placeholder="اسم الكتاب بالإنجليزي"/>
-  <label>المؤلف (اختياري):</label>
-  <input id="author" type="text" placeholder="اسم المؤلف"/>
-  <label>زاوية معينة (اختياري):</label>
-  <textarea id="focus" placeholder="مثلاً: ركز على تطبيق الفكرة في مصر"></textarea>
-  <label>مدة الفيديو:</label>
-  <div class="drow">
-    <button class="db" onclick="setD(this,'5')">5 دقايق</button>
-    <button class="db on" onclick="setD(this,'6')">6 دقايق</button>
-    <button class="db" onclick="setD(this,'7')">7 دقايق</button>
-  </div>
-  <button class="btn" onclick="gen()">⚡ ولّد المحتوى كامل</button>
-</div>
-</div>
-<div class="ld" id="ld"><div class="sp"></div><div class="lt" id="lt">بيفكر في أحسن زاوية للكتاب...</div></div>
-<div class="outs" id="outs">
-  <div class="sec"><div class="sh"><div class="st">🎯 العنوان الرئيسي <span class="bdg">copy-paste</span></div><button class="cp" onclick="cp('m',this)">نسخ</button></div><div class="sb" id="m"></div></div>
-  <div class="sec"><div class="sh"><div class="st">🔁 عناوين بديلة A/B Test <span class="bdg">3 خيارات</span></div><button class="cp" onclick="cp('a',this)">نسخ</button></div><div class="alts" id="a"></div></div>
-  <div class="sec"><div class="sh"><div class="st">⚡ Hook تيك توك <span class="bdg">أول 5 ثواني</span></div><button class="cp" onclick="cp('h',this)">نسخ</button></div><div class="sb" id="h"></div></div>
-  <div class="sec"><div class="sh"><div class="st">📝 سكريبت كامل <span class="bdg">عامية مصرية</span></div><button class="cp" onclick="cp('sc',this)">نسخ</button></div><div class="sb tall" id="sc"></div></div>
-  <div class="sec"><div class="sh"><div class="st">📄 Description <span class="bdg">يوتيوب + تيك توك</span></div><button class="cp" onclick="cp('d',this)">نسخ</button></div><div class="sb" id="d"></div></div>
-  <div class="sec"><div class="sh"><div class="st"># Hashtags <span class="bdg">عربي + انجليزي</span></div><button class="cp" onclick="cp('tg',this)">نسخ</button></div><div class="sb" id="tg"></div></div>
-  <div class="sec"><div class="sh"><div class="st">🖼️ Thumbnail Ideas <span class="bdg">3 خيارات</span></div><button class="cp" onclick="cp('th',this)">نسخ</button></div><div class="thumbs" id="th"></div></div>
-  <div class="sec"><div class="sh"><div class="st">🤖 NotebookLM Prompt <span class="bdg">copy-paste</span></div><button class="cp" onclick="cp('nb',this)">نسخ</button></div><div class="sb tall" id="nb"></div></div>
-  <div class="r2">
-    <button class="btn out" onclick="rst()">← كتاب جديد</button>
-    <button class="btn" onclick="showChk()">✅ روح للـ Checklist</button>
-  </div>
-</div>
-<div class="chk" id="chk">
-  <h3>✅ Checklist النشر</h3>
-  <div class="pw"><div class="pf" id="pf"></div></div>
-  <div id="cks"></div>
-  <button class="btn out" onclick="rst()" style="margin-top:1rem">← فيديو جديد</button>
-</div>
-</div>
-<div class="ntf" id="ntf">تم النسخ!</div>
-<script>
-let dur='6',ckst=[];
-const msgs=['بيفكر في أحسن زاوية للكتاب...','بيكتب سكريبت بالعامية المصرية...','بيعمل عناوين تشد الناس...','بيجهز كل حاجة للـ copy-paste...'];
-function setStep(n){[1,2,3].forEach(i=>{const e=document.getElementById('s'+i);e.className='step'+(i<n?' ok':i===n?' on':'')})}
-function pick(b,a,el){document.getElementById('book').value=b;document.getElementById('author').value=a;document.querySelectorAll('.bk').forEach(x=>x.classList.remove('sel'));el.classList.add('sel')}
-function setD(btn,v){dur=v;document.querySelectorAll('.db').forEach(b=>b.classList.remove('on'));btn.classList.add('on')}
-function get(t,k){const r=new RegExp('==='+k+'===\s*([\s\S]*?)(?====|$)');const m=t.match(r);return m?m[1].trim():''}
-async function gen(){
-  const book=document.getElementById('book').value.trim();
-  if(!book){alert('اكتب اسم الكتاب!');return}
-  document.getElementById('inp').style.display='none';
-  document.getElementById('outs').classList.remove('show');
-  document.getElementById('chk').classList.remove('show');
-  const ld=document.getElementById('ld');ld.classList.add('show');setStep(2);
-  let mi=0;const iv=setInterval(()=>{document.getElementById('lt').textContent=msgs[mi++%msgs.length]},2000);
-  try{
-    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({book,author:document.getElementById('author').value,focus:document.getElementById('focus').value,duration:dur})});
-    const data=await res.json();clearInterval(iv);ld.classList.remove('show');
-    parse(data.text);document.getElementById('outs').classList.add('show');setStep(2);
-  }catch(e){clearInterval(iv);ld.classList.remove('show');document.getElementById('inp').style.display='block';alert('في مشكلة، جرب تاني!')}
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  const { book, author, focus, duration } = req.body;
+  const API_KEY = process.env.GEMINI_API_KEY;
+  const prompt = 'You are a content creator for FGB Root YouTube/TikTok channel about wealth in Egyptian Arabic. Book: "' + book + '" by ' + (author||'unknown') + '. Duration: ' + duration + ' min. Generate using EXACTLY these separators: ===MAIN_TITLE=== (one powerful Arabic title) ===ALT_TITLES=== (3 alternative titles) ===HOOK=== (shocking TikTok opener in Egyptian Arabic) ===SCRIPT=== (full script in Egyptian Arabic, short sentences, Egyptian examples) ===DESCRIPTION=== (YouTube desc then --- then TikTok desc) ===HASHTAGS=== (Arabic and English on one line) ===THUMBNAIL_1=== (design idea 1) ===THUMBNAIL_2=== (design idea 2) ===THUMBNAIL_3=== (design idea 3) ===NOTEBOOKLM=== (full prompt for NotebookLM)' + (focus ? ' Focus on: ' + focus : '');
+  try {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.8, maxOutputTokens: 8192 } })
+    });
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    res.status(200).json({ text });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 }
-function parse(t){
-  document.getElementById('m').textContent=get(t,'MAIN_TITLE');
-  const alts=get(t,'ALT_TITLES').split('\n').filter(l=>l.trim());
-  document.getElementById('a').innerHTML=alts.map((x,i)=>'<div class="ai"><span>'+x+'</span><span class="an">خيار '+(i+1)+'</span></div>').join('');
-  document.getElementById('h').textContent=get(t,'HOOK');
-  document.getElementById('sc').textContent=get(t,'SCRIPT');
-  document.getElementById('d').textContent=get(t,'DESCRIPTION');
-  document.getElementById('tg').textContent=get(t,'HASHTAGS');
-  document.getElementById('th').innerHTML=[1,2,3].map(n=>'<div class="ti"><div class="tn">فكرة '+n+'</div>'+get(t,'THUMBNAIL_'+n)+'</div>').join('');
-  document.getElementById('nb').textContent=get(t,'NOTEBOOKLM');
-}
-function showChk(){
-  const items=[
-    {t:'حط الـ NotebookLM Prompt في notebook وراجع النطق',c:'nb'},
-    {t:'صدّر الفيديو من NotebookLM',c:'nb'},
-    {t:'افتح CapCut وحط اللوجو + Foundation/Growth/Beyond',c:'cp'},
-    {t:'اعمل الـ Thumbnail على ChatGPT',c:'yt'},
-    {t:'ارفع على يوتيوب + العنوان + Description + Hashtags',c:'yt'},
-    {t:'ارفع على تيك توك + الـ Hook في الـ caption',c:'tt'},
-    {t:'قطّع الفيديو Shorts/Reels وارفعهم',c:'tt'},
-    {t:'في كل تيك توك: "الفيديو الكامل على يوتيوب @FGBRoot"',c:'tt'},
-  ];
-  ckst=items.map(()=>false);
-  document.getElementById('cks').innerHTML=items.map((x,i)=>'<div class="ci" id="ci'+i+'" onclick="tog('+i+')"><div class="cb"></div><div class="ct"><span class="tg '+x.c+'">'+x.c.toUpperCase()+'</span>'+x.t+'</div></div>').join('');
-  document.getElementById('outs').classList.remove('show');document.getElementById('chk').classList.add('show');setStep(3);upP();
-}
-function tog(i){ckst[i]=!ckst[i];document.getElementById('ci'+i).classList.toggle('done',ckst[i]);upP()}
-function upP(){const d=ckst.filter(Boolean).length;document.getElementById('pf').style.width=(ckst.length?d/ckst.length*100:0)+'%'}
-function cp(id,btn){
-  const el=document.getElementById(id);const t=el.innerText||el.textContent;
-  navigator.clipboard.writeText(t).then(()=>{btn.textContent='✓ تم';btn.classList.add('ok');showN();setTimeout(()=>{btn.textContent='نسخ';btn.classList.remove('ok')},2000)});
-}
-function showN(){const n=document.getElementById('ntf');n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2000)}
-function rst(){document.getElementById('inp').style.display='block';document.getElementById('outs').classList.remove('show');document.getElementById('chk').classList.remove('show');document.getElementById('book').value='';document.getElementById('author').value='';document.getElementById('focus').value='';document.querySelectorAll('.bk').forEach(x=>x.classList.remove('sel'));setStep(1)}
-</script>
-</body>
-</html>
